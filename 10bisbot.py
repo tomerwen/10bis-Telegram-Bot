@@ -1,19 +1,27 @@
-import logging
-from telegram import Update
-from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
+import telebot
+import credentials
 
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id, text="I'm a bot, please talk to me!")
+bot = telebot.TeleBot(credentials.bot_token)
 
-if __name__ == '__main__':
-    application = ApplicationBuilder().token('5757017167:AAGvkM6Sow6IKdQsf4ZHWvlATGVCwQiEZrE').build()
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+	bot.reply_to(message, "Hello World, use /help to learn more commands")
+
+@bot.message_handler(commands=['version'])
+def version(message):
+    bot.reply_to(message, "1.0")
     
-    start_handler = CommandHandler('start', start)
-    application.add_handler(start_handler)
-    
-    application.run_polling()
+@bot.message_handler(commands=['help'])
+def help(message):
+    bot.reply_to(message, 
+    """
+    Commands that you can use:
+    /start    ->    Replies with Hello world
+    /version  ->    Shows the current released version
+    /help     ->    Thats how you got here
+    """
+                 
+                 )
+
+bot.infinity_polling()

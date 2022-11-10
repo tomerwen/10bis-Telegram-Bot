@@ -4,7 +4,7 @@ import credentials
 from io import BytesIO
 import requests
 from PIL import Image
-from os import path, rename
+from os import path, rename,listdir
 import base64
 import cv2
 from pyzbar.pyzbar import decode
@@ -13,7 +13,6 @@ from datetime import datetime
 #Variables
 
 Path = credentials.Path
-voucher_number = 0
 
 bot = telebot.TeleBot(credentials.bot_token)
 
@@ -38,8 +37,36 @@ def add(message):
         new_file.write(downloaded_file) 
     bot.reply_to(message, f"Added as {current_time}.jpg")
     
-
+@bot.message_handler(commands=['list'])
+def list(message):
+    items = 0
+    list = listdir(Path)
+    ans = ''
+    for item in list:
+        ans += item + '\n'
+        items += 1
+    if items == 0:
+        ans = "There are no vouchers present"
+    else: ans += f"\nIn total there are {items} vouchers"
+    bot.reply_to(message, ans)
     
+    
+@bot.message_handler(commands=['give'])
+def give(message):
+    name_file = listdir(Path)
+    if len(name_file) ==  0:
+            bot.reply_to(message, text='There are no vouchers present')
+    else:
+        name = name_file[0] #shows the first file that appears on the folder
+        test = open(Path + str(name))
+        bot.send_photo(message.chat.id,photo=open(Path + str(name), 'rb') , caption = 'Returned voucher', reply_markup=keyboard)
+    
+button_foo = telebot.types.InlineKeyboardButton('Delete this voucher', callback_data='foo')
+keyboard = telebot.types.InlineKeyboardMarkup()
+keyboard.add(button_foo)
+
+
+
     
 @bot.message_handler(commands=['help'])
 def help(message):
@@ -49,6 +76,7 @@ def help(message):
     /start    ->    Replies with Hello world
     /version  ->    Shows the current released version
     /help     ->    Thats how you got here
+    /list     ->    Returns a list of files and in the end the total number of them
     """         
                  )
 

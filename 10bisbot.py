@@ -77,6 +77,7 @@ def help(message):
     /version  ->    Shows the current released version
     /help     ->    Thats how you got here
     /list     ->    Returns a list of files and in the end the total number of them
+    /give     ->    Returns a voucher
     """         
                  )
 

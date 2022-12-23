@@ -1,12 +1,8 @@
 from turtle import down
 import telebot
 import credentials
-from io import BytesIO
 import requests
-from PIL import Image
 from os import path, rename,listdir
-import base64
-import cv2
 from pyzbar.pyzbar import decode
 from datetime import datetime
 

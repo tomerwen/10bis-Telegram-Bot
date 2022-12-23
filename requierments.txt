@@ -1,0 +1,5 @@
+turtle
+telebot
+requests
+pyzbar.pyzbar
+logging

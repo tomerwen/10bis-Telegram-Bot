@@ -2,9 +2,12 @@ from turtle import down
 import telebot
 import credentials
 import requests
-from os import path, rename,listdir
-from pyzbar.pyzbar import decode
+from os import path,listdir,remove
 from datetime import datetime
+import logging
+
+logger = telebot.logger
+telebot.logger.setLevel(logging.DEBUG)
 
 #Variables
 
@@ -15,6 +18,7 @@ bot = telebot.TeleBot(credentials.bot_token)
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     bot.reply_to(message, "Hello World, use /help to learn more commands")
+    bot.answer_callback_query(id=message, text="Success")
 
 @bot.message_handler(commands=['version'])
 def version(message):
@@ -53,17 +57,32 @@ def give(message):
     if len(name_file) ==  0:
             bot.reply_to(message, text='There are no vouchers present')
     else:
-        name = name_file[0] #shows the first file that appears on the folder
-        test = open(Path + str(name))
-        bot.send_photo(message.chat.id,photo=open(Path + str(name), 'rb') , caption = 'Returned voucher', reply_markup=keyboard)
+        name = name_file[0]  #shows the first file that appears on the folder
+        button_name = telebot.types.InlineKeyboardButton('Delete this voucher', callback_data=name)
+        keyboard = telebot.types.InlineKeyboardMarkup()
+        keyboard.add(button_name) 
+        bot.send_photo(message.chat.id,photo=open(Path + str(name), 'rb') , caption = name, reply_markup=keyboard)
     
-button_foo = telebot.types.InlineKeyboardButton('Delete this voucher', callback_data='foo')
-keyboard = telebot.types.InlineKeyboardMarkup()
-keyboard.add(button_foo)
+@bot.callback_query_handler(func=lambda call:True)
+def direct(call):
+    name = call.data
+    delete(call.message, name)
+
+
+def delete(message , name):
+    file_name = name
+    chat_id = message.chat.id
+    if file_name in listdir(Path):
+        remove(Path + file_name)
+        bot.send_message(chat_id, "Succesfuly deleted " + file_name)
+    else:
+        bot.send_message(chat_id, "File doesnt exists")
 
 
 
     
+    
+
 @bot.message_handler(commands=['help'])
 def help(message):
     bot.reply_to(message, 

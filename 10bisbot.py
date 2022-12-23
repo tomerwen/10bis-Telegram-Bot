@@ -1,8 +1,7 @@
 from turtle import down
 import telebot
-import credentials
 import requests
-from os import path,listdir,remove
+from os import path,listdir,remove,getenv
 from datetime import datetime
 import logging
 
@@ -11,9 +10,9 @@ telebot.logger.setLevel(logging.DEBUG)
 
 #Variables
 
-Path = credentials.Path
-
-bot = telebot.TeleBot(credentials.bot_token)
+Path = getenv("Path")
+token = getenv("BOT_API")
+bot = telebot.TeleBot(token)
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
@@ -31,7 +30,7 @@ def add(message):
     current_time = now.strftime("%d%b%H-%M-%S")
     fileID = message.photo[-1].file_id
     file_info = bot.get_file(fileID)
-    file = requests.get(f'https://api.telegram.org/file/bot{credentials.bot_token}/{fileID}'.format(credentials.bot_token, file_info.file_path)) 
+    file = requests.get(f'https://api.telegram.org/file/bot{token}/{fileID}'.format(token, file_info.file_path)) 
     downloaded_file = bot.download_file(file_info.file_path)
     with open(path.join(Path , f"{current_time}.jpg"), 'wb') as new_file:
         new_file.write(downloaded_file) 

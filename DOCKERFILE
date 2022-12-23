@@ -3,11 +3,12 @@
 FROM python:latest
 #install dependencies
 
-RUN pip3 install python-telegram-bot --upgrade && pip3 install -r requierments.txt
+RUN pip3 install python-telegram-bot --upgrade
 
 #setup work enviorment
 RUN mkdir app && cp . /app
 WORKDIR /app
+COPY . ./
 #create the directory for the vouchers
 RUN mkdir Vouchers
 
